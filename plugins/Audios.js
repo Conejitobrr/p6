@@ -152,6 +152,11 @@ if (chat.audios && m.text.match(/(something|Something)/gi)) {
 let vn = './media/Something.mp3'
 this.sendPresenceUpdate('recording', m.chat)   
 this.sendFile(m.chat, vn, 'error.mp3', null, m, true, {type: 'audioMessage', ptt: true})}
+  
+if (chat.audios && m.text.match(/(Basura|basura)/gi)) {
+let vn = './media/Basura.mp3'
+this.sendPresenceUpdate('recording', m.chat)   
+this.sendFile(m.chat, vn, 'error.mp3', null, m, true, {type: 'audioMessage', ptt: true})}
 
 if (chat.audios && m.text.match(/(dolor|Dolor)/gi)) {
 let vn = './media/Dolor.mp3'
