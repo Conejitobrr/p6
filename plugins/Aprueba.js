@@ -7,7 +7,7 @@ m.reply('*[❗] 𝙲𝙾𝙽𝚅𝙸𝙴𝚁𝚃𝙸𝙴𝙽𝙳𝙾 𝙸𝙼�
 let data = await q.download?.()
 let image = await uploadImage(data)
 try {
-let sremovebg = global.API(`https://api.lolhuman.xyz/api/yugioh?apikey=${lolkeysapi}&img=${url}`)
+let sremovebg = global.API(`https://api.lolhuman.xyz/api/amongus?apikey=${lolkeysapi}&text=${text}`)
 await conn.sendFile(m.chat, anime, 'error.jpg', null, m)
 } catch (i) {
 try {
