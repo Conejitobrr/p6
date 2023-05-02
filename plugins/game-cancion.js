@@ -1,36 +1,25 @@
-/* Created By https://github.com/unptoadrih15 */
+/* Created by https://github.com/unptoadrih15 */
 
-import fetch from 'node-fetch'
-let timeout = 60000
-let poin = 1000
-let handler = async (m, { conn, usedPrefix }) => {
-conn.tebaklagu = conn.tebaklagu ? conn.tebaklagu : {}
-let id = m.chat
-if (id in conn.tebaklagu) {
-conn.reply(m.chat, 'Todavía hay canciones sin respuesta en este chat.', conn.tebaklagu[id][0])
-throw false
-}
-let res = await fetch(global.API('xteam', '/game/tebaklagu/', { id: '5LTV57azwaid7dXfz5fzJu' }, 'APIKEY'))
-if (res.status !== 200) throw await res.text()
-let result = await res.json()
-let json = result.result
-let caption = `
-ADIVINA EL TITULO DE LA CANCION
-Tiempo ${(timeout / 1000).toFixed(2)} segundos
-Escribe *${usedPrefix}pista* Para obtener una pista
-Premio: ${poin} XP
-RESPONDE A ESTE MENSAJE CON LAS RESPUESTAS!`.trim()
-conn.tebaklagu[id] = [
-await m.reply(caption),
-json, poin,
-setTimeout(() => {
-if (conn.tebaklagu[id]) conn.reply(m.chat, `Se acabó el tiempo!\nLa respuesta es ${json.judul}`, conn.tebaklagu[id][0])
-delete conn.tebaklagu[id]
-}, timeout)
-]
-await conn.sendFile(m.chat, json.preview, 'coba-lagi.mp3', '', m)
-}
-handler.help = ['tebaklagu']
-handler.tags = ['game']
-handler.command = /^cancion|canción$/i
-export default handler
+import similarity from "similarity";
+const threshold = 0.72;
+let handler = {
+  async before(m) {
+    let id = m.chat;
+    if (!m.quoted || !m.quoted.fromMe || !m.quoted.isBaileys || !/ADIVINA EL TITULO DE LA CANCION/i.test(m.quoted.text)) return !0;
+    this.tebaklagu = this.tebaklagu ? this.tebaklagu : {};
+    if (!(id in this.tebaklagu)) return m.reply("El juego ha terminado");
+    if (m.quoted.id == this.tebaklagu[id][0].id) {
+      let json = JSON.parse(JSON.stringify(this.tebaklagu[id][1]));
+      if (m.text.toLowerCase() == json.judul.toLowerCase().trim()) {
+        global.db.data.users[m.sender].exp += this.tebaklagu[id][2];
+        m.reply(`✅Correcto!\n+${this.tebaklagu[id][2]} XP`);
+        clearTimeout(this.tebaklagu[id][3]);
+        delete this.tebaklagu[id];
+      } else if (similarity(m.text.toLowerCase(), json.judul.toLowerCase().trim()) >= threshold) m.reply(`Casii!`);
+      else m.reply(`❌Incorrecto!`);
+    }
+    return !0;
+  },
+  exp: 0,
+};
+export default handler;
